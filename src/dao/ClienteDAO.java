@@ -53,5 +53,43 @@ public class ClienteDAO {
         }
         return clientes;
     }
+    
+    public Cliente buscarClientePorNombre(String nombre) {
+    String sql = "SELECT * FROM clientes WHERE nombre = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+        stmt.setString(1, nombre);
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return new Cliente(
+                        rs.getInt("id"),
+                        rs.getString("nombre"),
+                        rs.getString("email"),
+                        rs.getString("telefono"),
+                        rs.getString("direccion")
+                );
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al buscar cliente: " + e.getMessage());
+    }
+    return null;
+    
+    public int contarClientes() {
+    String sql = "SELECT COUNT(*) FROM clientes";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql);
+         ResultSet rs = stmt.executeQuery()) {
+
+        if (rs.next()) {
+            return rs.getInt(1);
+        }
+        
+    } catch (SQLException e) {
+        System.err.println("Error al contar clientes: " + e.getMessage());
+    }
+    return 0;
+}
+    
 }
